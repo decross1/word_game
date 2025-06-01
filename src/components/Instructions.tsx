@@ -16,10 +16,10 @@ const InstructionsContainer = styled.div<InstructionsContainerProps>`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   max-width: 300px;
   transition: all 0.3s ease;
+  transform: translateX(${props => props.isCollapsed ? 'calc(-100% + 40px)' : '0'});
   
   @media (max-width: 768px) {
     max-width: 250px;
-    transform: translateX(${props => props.isCollapsed ? 'calc(-100% + 40px)' : '0'});
     font-size: 0.9em;
     padding: 10px;
   }
@@ -36,11 +36,6 @@ const ToggleButton = styled.button`
   padding: 8px;
   cursor: pointer;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  display: none;
-
-  @media (max-width: 768px) {
-    display: block;
-  }
 `;
 
 const ContentContainer = styled.div<InstructionsContainerProps>`

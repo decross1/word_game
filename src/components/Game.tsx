@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Board from './Board';
 import Instructions from './Instructions';
+import LevelSelectionModal from './LevelSelectionModal';
 import styled from '@emotion/styled';
-import type { BoardState, CellType } from './Board';
+import type { BoardState } from './Board';
+import type { LevelData } from '../levels';
+import { LEVELS, getNextLevel } from '../levels';
 
 const GameContainer = styled.div`
   text-align: center;
@@ -112,27 +115,90 @@ const StatItem = styled.div`
   }
 `;
 
-const LEVEL_1: BoardState = [
-  ['wall', 'wall', 'wall', 'wall', 'wall'],
-  ['wall', 'floor', 'floor', 'floor', 'wall'],
-  ['wall', 'floor', 'box', 'target', 'wall'],
-  ['wall', 'floor', 'player', 'floor', 'wall'],
-  ['wall', 'wall', 'wall', 'wall', 'wall'],
-];
+const ProgressBar = styled.div`
+  width: 300px;
+  height: 10px;
+  background: #f0f0f0;
+  border-radius: 5px;
+  margin: 20px auto;
+  overflow: hidden;
+`;
+
+const Progress = styled.div<{ width: number }>`
+  width: ${props => props.width}%;
+  height: 100%;
+  background: #4CAF50;
+  transition: width 0.3s ease;
+`;
+
+const LevelIndicator = styled.div`
+  font-size: 1.2em;
+  color: #666;
+  margin: 10px 0;
+  
+  span {
+    color: #4CAF50;
+    font-weight: bold;
+  }
+`;
+
+const MenuButton = styled.button`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  margin-right: 10px;
+  
+  &:hover {
+    background: #f5f5f5;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
 
 const Game: React.FC = () => {
-  const [board, setBoard] = useState<BoardState>(LEVEL_1);
-  const [playerPosition, setPlayerPosition] = useState<[number, number]>([3, 2]);
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [board, setBoard] = useState<BoardState>(LEVELS[currentLevel].board);
+  const [playerPosition, setPlayerPosition] = useState<[number, number]>(LEVELS[currentLevel].playerStart);
   const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [moveCount, setMoveCount] = useState(0);
   const [pushCount, setPushCount] = useState(0);
+  const [highestUnlockedLevel, setHighestUnlockedLevel] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const resetGame = () => {
-    setBoard(LEVEL_1);
-    setPlayerPosition([3, 2]);
+  const resetLevel = () => {
+    const level = LEVELS[currentLevel];
+    setBoard(level.board);
+    setPlayerPosition(level.playerStart);
     setIsLevelComplete(false);
     setMoveCount(0);
     setPushCount(0);
+  };
+
+  const progressToNextLevel = () => {
+    const nextLevel = getNextLevel(currentLevel);
+    if (nextLevel !== null) {
+      setCurrentLevel(nextLevel);
+      setHighestUnlockedLevel(prev => Math.max(prev, nextLevel));
+      const level = LEVELS[nextLevel];
+      setBoard(level.board);
+      setPlayerPosition(level.playerStart);
+      setIsLevelComplete(false);
+      setMoveCount(0);
+      setPushCount(0);
+    }
   };
 
   const checkLevelComplete = (newBoard: BoardState) => {
@@ -217,14 +283,22 @@ const Game: React.FC = () => {
     setMoveCount(prev => prev + 1);
   };
 
+  const selectLevel = (levelIndex: number) => {
+    setCurrentLevel(levelIndex);
+    const level = LEVELS[levelIndex];
+    setBoard(level.board);
+    setPlayerPosition(level.playerStart);
+    setIsLevelComplete(false);
+    setMoveCount(0);
+    setPushCount(0);
+  };
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'r' && e.ctrlKey) {
-        resetGame();
+        resetLevel();
         return;
       }
-
-      if (isLevelComplete) return;
 
       switch (e.key) {
         case 'ArrowUp':
@@ -250,38 +324,84 @@ const Game: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [board, playerPosition, isLevelComplete]);
 
+  const progressPercentage = ((currentLevel + (isLevelComplete ? 1 : 0)) / LEVELS.length) * 100;
+
   return (
     <GameContainer>
       <TitleSection>
         <h1>Sokoban Game</h1>
         {!isLevelComplete && (
-          <ResetButton onClick={resetGame} title="Reset Level (Ctrl+R)">
-            <svg 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
+          <>
+            <MenuButton 
+              onClick={() => setIsMenuOpen(true)} 
+              title="Select Level"
             >
-              <path 
-                d="M4 12C4 7.58172 7.58172 4 12 4C14.5171 4 16.7796 5.1017 18.3203 6.88446L16 9H22V3L19.4081 5.59191C17.5119 3.51137 14.8768 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12H20C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12Z"
-                fill="black"
-              />
-            </svg>
-          </ResetButton>
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" 
+                  fill="black"
+                />
+              </svg>
+            </MenuButton>
+            <ResetButton onClick={resetLevel} title="Reset Level (Ctrl+R)">
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  d="M4 12C4 7.58172 7.58172 4 12 4C14.5171 4 16.7796 5.1017 18.3203 6.88446L16 9H22V3L19.4081 5.59191C17.5119 3.51137 14.8768 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12H20C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12Z"
+                  fill="black"
+                />
+              </svg>
+            </ResetButton>
+          </>
         )}
       </TitleSection>
+
+      <LevelSelectionModal
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        currentLevel={currentLevel}
+        highestUnlockedLevel={highestUnlockedLevel}
+        onSelectLevel={selectLevel}
+      />
+
+      <LevelIndicator>
+        Level <span>{currentLevel + 1}</span> of {LEVELS.length}
+      </LevelIndicator>
+      
+      <ProgressBar>
+        <Progress width={progressPercentage} />
+      </ProgressBar>
       
       <StatsPanel>
         {isLevelComplete ? (
           <>
             <LevelComplete>
-              Level Complete! 🎉
+              Level {currentLevel + 1} Complete! 🎉
             </LevelComplete>
             <ButtonGroup>
-              <Button onClick={resetGame}>
-                Play Again
-              </Button>
+              {getNextLevel(currentLevel) !== null ? (
+                <Button onClick={progressToNextLevel}>
+                  Next Level
+                </Button>
+              ) : (
+                <Button onClick={() => {
+                  setCurrentLevel(0);
+                  resetLevel();
+                }}>
+                  Play Again
+                </Button>
+              )}
             </ButtonGroup>
           </>
         ) : null}
