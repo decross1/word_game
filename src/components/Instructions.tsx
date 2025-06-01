@@ -1,29 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import type { CellType } from './Board';
 
-const InstructionsContainer = styled.div`
+interface InstructionsContainerProps {
+  isCollapsed: boolean;
+}
+
+const InstructionsContainer = styled.div<InstructionsContainerProps>`
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   max-width: 300px;
+  transition: all 0.3s ease;
+  
+  @media (max-width: 768px) {
+    max-width: 250px;
+    transform: translateX(${props => props.isCollapsed ? 'calc(-100% + 40px)' : '0'});
+    font-size: 0.9em;
+    padding: 10px;
+  }
+`;
+
+const ToggleButton = styled.button`
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 0 8px 8px 0;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
 
 const Legend = styled.div`
   display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 10px;
+  grid-template-columns: 30px 1fr;
+  gap: 8px;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 12px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 25px 1fr;
+    gap: 6px;
+  }
 `;
 
 const LegendItem = styled.div<{ cellType: CellType }>`
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: ${({ cellType }) => {
@@ -37,39 +72,45 @@ const LegendItem = styled.div<{ cellType: CellType }>`
       default: return '#fff';
     }
   }};
+
+  @media (max-width: 768px) {
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 const Instructions: React.FC = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <InstructionsContainer>
-      <h3 style={{ margin: '0 0 10px 0' }}>How to Play Sokoban</h3>
-      <p style={{ margin: '0 0 15px 0' }}>
-        Push all boxes onto the target spots to complete the level.
+    <InstructionsContainer isCollapsed={isCollapsed}>
+      <ToggleButton onClick={() => setIsCollapsed(!isCollapsed)}>
+        {isCollapsed ? '►' : '◄'}
+      </ToggleButton>
+      
+      <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1em' }}>How to Play</h3>
+      <p style={{ margin: '0 0 12px 0', fontSize: '0.9em' }}>
+        Push boxes onto targets to win!
       </p>
       <Legend>
         <LegendItem cellType="player" />
-        <span>Player (Move with WASD or Arrow keys)</span>
+        <span>Player (WASD/Arrows)</span>
         
         <LegendItem cellType="box" />
-        <span>Box (Push these to targets)</span>
+        <span>Box</span>
         
         <LegendItem cellType="target" />
-        <span>Target (Place boxes here)</span>
+        <span>Target</span>
         
         <LegendItem cellType="boxOnTarget" />
-        <span>Box on target (Goal achieved!)</span>
+        <span>Box on target</span>
         
         <LegendItem cellType="wall" />
-        <span>Wall (Can't move through)</span>
+        <span>Wall</span>
       </Legend>
       
-      <div style={{ marginTop: '15px', fontSize: '0.9em', color: '#666' }}>
-        <p style={{ margin: '5px 0' }}>Tips:</p>
-        <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
-          <li>You can't pull boxes</li>
-          <li>Plan your moves carefully</li>
-          <li>Some positions may block boxes forever!</li>
-        </ul>
+      <div style={{ marginTop: '12px', fontSize: '0.85em', color: '#666' }}>
+        <p style={{ margin: '4px 0' }}>Tip: You can't pull boxes!</p>
       </div>
     </InstructionsContainer>
   );
