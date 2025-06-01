@@ -43,12 +43,20 @@ const ToggleButton = styled.button`
   }
 `;
 
+const ContentContainer = styled.div<InstructionsContainerProps>`
+  opacity: ${props => props.isCollapsed ? 0 : 1};
+  visibility: ${props => props.isCollapsed ? 'hidden' : 'visible'};
+  transition: opacity 0.2s ease;
+  transition-delay: ${props => props.isCollapsed ? '0s' : '0.2s'};
+`;
+
 const Legend = styled.div`
   display: grid;
   grid-template-columns: 30px 1fr;
   gap: 8px;
   align-items: center;
   margin-top: 12px;
+  color: #333;
 
   @media (max-width: 768px) {
     grid-template-columns: 25px 1fr;
@@ -88,30 +96,32 @@ const Instructions: React.FC = () => {
         {isCollapsed ? '►' : '◄'}
       </ToggleButton>
       
-      <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1em' }}>How to Play</h3>
-      <p style={{ margin: '0 0 12px 0', fontSize: '0.9em' }}>
-        Push boxes onto targets to win!
-      </p>
-      <Legend>
-        <LegendItem cellType="player" />
-        <span>Player (WASD/Arrows)</span>
+      <ContentContainer isCollapsed={isCollapsed}>
+        <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1em', color: '#222' }}>How to Play</h3>
+        <p style={{ margin: '0 0 12px 0', fontSize: '0.9em', color: '#333' }}>
+          Push boxes onto targets to win!
+        </p>
+        <Legend>
+          <LegendItem cellType="player" />
+          <span>Player (WASD/Arrows)</span>
+          
+          <LegendItem cellType="box" />
+          <span>Box</span>
+          
+          <LegendItem cellType="target" />
+          <span>Target</span>
+          
+          <LegendItem cellType="boxOnTarget" />
+          <span>Box on target</span>
+          
+          <LegendItem cellType="wall" />
+          <span>Wall</span>
+        </Legend>
         
-        <LegendItem cellType="box" />
-        <span>Box</span>
-        
-        <LegendItem cellType="target" />
-        <span>Target</span>
-        
-        <LegendItem cellType="boxOnTarget" />
-        <span>Box on target</span>
-        
-        <LegendItem cellType="wall" />
-        <span>Wall</span>
-      </Legend>
-      
-      <div style={{ marginTop: '12px', fontSize: '0.85em', color: '#666' }}>
-        <p style={{ margin: '4px 0' }}>Tip: You can't pull boxes!</p>
-      </div>
+        <div style={{ marginTop: '12px', fontSize: '0.85em', color: '#555' }}>
+          <p style={{ margin: '4px 0' }}>Tip: You can't pull boxes!</p>
+        </div>
+      </ContentContainer>
     </InstructionsContainer>
   );
 };
