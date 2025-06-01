@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 
-export type CellType = 'wall' | 'floor' | 'player' | 'box' | 'target' | 'boxOnTarget';
+export type CellType = 'wall' | 'floor' | 'player' | 'box' | 'target' | 'boxOnTarget' | 'playerOnTarget';
 
 export type BoardState = CellType[][];
 
@@ -29,6 +29,7 @@ const Cell = styled.div<CellProps>`
       case 'box': return '#8b4513';
       case 'boxOnTarget': return '#4CAF50';
       case 'player': return '#4169e1';
+      case 'playerOnTarget': return '#4169e1';
       default: return '#fff';
     }
   }};
