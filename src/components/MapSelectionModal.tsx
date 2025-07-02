@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { LEVELS } from '../levels';
+import { MAPS } from '../levels';
 
-interface LevelSelectionModalProps {
+interface MapSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentLevel: number;
-  highestUnlockedLevel: number;
-  onSelectLevel: (level: number) => void;
+  currentMap: number;
+  highestUnlockedMap: number;
+  onSelectMap: (mapIndex: number) => void;
 }
 
 const MenuOverlay = styled.div<{ isOpen: boolean }>`
@@ -63,14 +63,14 @@ const CloseButton = styled.button`
   }
 `;
 
-const LevelGrid = styled.div`
+const MapGrid = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px 0;
 `;
 
-const LevelButton = styled.button<{ isUnlocked: boolean; isActive: boolean }>`
+const MapButton = styled.button<{ isUnlocked: boolean; isActive: boolean }>`
   width: 100%;
   padding: 15px 20px;
   border: none;
@@ -104,30 +104,29 @@ const LevelButton = styled.button<{ isUnlocked: boolean; isActive: boolean }>`
   }
 `;
 
-const LevelInfo = styled.div`
+const MapInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
 `;
 
-const LevelNumber = styled.span`
+const MapNumber = styled.span`
   font-size: 1.2em;
   font-weight: 500;
 `;
 
-const LevelStatus = styled.span<{ isComplete: boolean }>`
+const MapStatus = styled.span<{ isComplete: boolean }>`
   font-size: 24px;
   color: ${props => props.isComplete ? '#4CAF50' : '#ddd'};
 `;
 
-const LevelSelectionModal: React.FC<LevelSelectionModalProps> = ({
+const MapSelectionModal: React.FC<MapSelectionModalProps> = ({
   isOpen,
   onClose,
-  currentLevel,
-  highestUnlockedLevel,
-  onSelectLevel,
+  currentMap,
+  highestUnlockedMap,
+  onSelectMap,
 }) => {
-  // Close on escape key
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -142,39 +141,39 @@ const LevelSelectionModal: React.FC<LevelSelectionModalProps> = ({
     <MenuOverlay isOpen={isOpen} onClick={onClose}>
       <MenuContainer isOpen={isOpen} onClick={e => e.stopPropagation()}>
         <MenuHeader>
-          <h2 style={{ margin: 0 }}>Select Level</h2>
+          <h2 style={{ margin: 0 }}>Select Map</h2>
           <CloseButton onClick={onClose}>&times;</CloseButton>
         </MenuHeader>
-        <LevelGrid>
-          {LEVELS.map((_, index) => (
-            <LevelButton
+        <MapGrid>
+          {MAPS.map((_, index) => (
+            <MapButton
               key={index}
-              isUnlocked={index <= highestUnlockedLevel}
-              isActive={index === currentLevel}
+              isUnlocked={index <= highestUnlockedMap}
+              isActive={index === currentMap}
               onClick={() => {
-                if (index <= highestUnlockedLevel) {
-                  onSelectLevel(index);
+                if (index <= highestUnlockedMap) {
+                  onSelectMap(index);
                   onClose();
                 }
               }}
             >
-              <LevelInfo>
-                <LevelNumber>Level {index + 1}</LevelNumber>
-                {index <= highestUnlockedLevel && index !== currentLevel && (
+              <MapInfo>
+                <MapNumber>Map {index + 1}</MapNumber>
+                {index <= highestUnlockedMap && index !== currentMap && (
                   <span style={{ color: '#666', fontSize: '0.9em' }}>
-                    {index < highestUnlockedLevel ? 'Completed' : 'Current'}
+                    {index < highestUnlockedMap ? 'Completed' : 'Current'}
                   </span>
                 )}
-              </LevelInfo>
-              <LevelStatus isComplete={index < highestUnlockedLevel}>
-                {index < highestUnlockedLevel ? '✓' : '○'}
-              </LevelStatus>
-            </LevelButton>
+              </MapInfo>
+              <MapStatus isComplete={index < highestUnlockedMap}>
+                {index < highestUnlockedMap ? '✓' : '○'}
+              </MapStatus>
+            </MapButton>
           ))}
-        </LevelGrid>
+        </MapGrid>
       </MenuContainer>
     </MenuOverlay>
   );
 };
 
-export default LevelSelectionModal; 
+export default MapSelectionModal;
