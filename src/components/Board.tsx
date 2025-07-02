@@ -1,9 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 
-export type CellType = 'wall' | 'floor' | 'player' | 'box' | 'target' | 'boxOnTarget' | 'playerOnTarget';
-
-export type BoardState = CellType[][];
+import type { BoardState, CellType } from '../types';
 
 interface BoardProps {
   board: BoardState;

@@ -1,4 +1,4 @@
-import type { BoardState } from '../components/Board';
+import type { BoardState } from '../types';
 import { solve } from './solver';
 
 export interface ValidationError {

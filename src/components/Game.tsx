@@ -3,7 +3,7 @@ import Board from './Board';
 import Instructions from './Instructions';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/react';
-import type { BoardState } from './Board';
+import type { BoardState } from '../types';
 import type { MapData } from '../levels';
 import { MAPS } from '../levels';
 import { generateDynamicMap } from '../utils/mapGenerator';

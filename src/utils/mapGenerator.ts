@@ -1,5 +1,5 @@
 import type { MapData } from '../levels/staticMaps';
-import type { BoardState, Tile } from '../components/Board';
+import type { BoardState, CellType } from '../types';
 
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -29,27 +29,28 @@ export const generateDynamicMap = (): MapData => {
     }
   }
 
-  const placeItem = (item: Tile) => {
+  const placeItem = (board: BoardState, object: CellType): [number, number] | void => {
     let placed = false;
     while (!placed) {
       const x = getRandomInt(1, width - 2);
       const y = getRandomInt(1, height - 2);
       if (board[y][x] === 'floor') {
-        board[y][x] = item;
+        board[y][x] = object;
         placed = true;
-        if (item === 'player') return [y, x];
+        if (object === 'player') {
+          return [y, x];
+        }
       }
     }
-    return [0, 0]; // Should not happen
   };
 
   const numBoxes = getRandomInt(2, 4);
   for (let i = 0; i < numBoxes; i++) {
-    placeItem('box');
-    placeItem('target');
+    placeItem(board, 'box');
+    placeItem(board, 'target');
   }
 
-  const playerStart = placeItem('player') as [number, number];
+  const playerStart = placeItem(board, 'player') as [number, number];
 
   return {
     board,

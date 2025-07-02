@@ -1,4 +1,4 @@
-import type { BoardState, CellType } from '../components/Board';
+import type { BoardState, CellType } from '../types';
 
 // --- Helper functions adapted for our project ---
 

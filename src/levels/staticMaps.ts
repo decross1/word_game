@@ -1,4 +1,4 @@
-import type { BoardState } from '../components/Board';
+import type { BoardState } from '../types';
 
 export interface MapData {
   board: BoardState;

@@ -258,3 +258,14 @@ export const reportedMap1751420932648 = {
   ],
   playerStart: [5, 6],
 };
+
+export const reportedMap1751421541722 = {
+  board: [
+    'wallwallwallwallwallwall',
+    'wallfloorfloorfloorfloorwall',
+    'wallfloorboxboxtargetwall',
+    'wallfloorplayerfloortargetwall',
+    'wallwallwallwallwallwall'
+  ],
+  playerStart: [3, 2],
+};
